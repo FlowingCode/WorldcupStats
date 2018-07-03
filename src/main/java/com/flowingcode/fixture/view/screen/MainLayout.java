@@ -15,14 +15,13 @@ import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
 import com.vaadin.flow.shared.ui.LoadMode;
-import com.vaadin.flow.shared.ui.Transport;
 
 /**
  * The main view contains a simple label element and a template element.
  */
 @SuppressWarnings("serial")
 @HtmlImport(value = "styles/shared-styles.html", loadMode = LoadMode.INLINE)
-@PageTitle("Worldcup 2018 Stats - by Flowing Code S.A.")
+@PageTitle("World Cup 2018 Stats - by Flowing Code S.A.")
 @Push
 public class MainLayout extends VerticalLayout implements RouterLayout, PageConfigurator {
 
@@ -33,13 +32,12 @@ public class MainLayout extends VerticalLayout implements RouterLayout, PageConf
         setMargin(false);
         setSpacing(false);
         setPadding(false);
-        final AppLayout app = new AppLayout("Worldcup 2018 Stats");
+        final AppLayout app = new AppLayout("World Cup 2018 Stats");
         app.setMenuItems(
                 new MenuItem("Home", () -> UI.getCurrent().navigate("")),
                 new MenuItem("Matches", () -> UI.getCurrent().navigate("matches")),
                 new MenuItem("Groups", () -> UI.getCurrent().navigate("groups")),
-                new MenuItem("About ...", () -> UI.getCurrent().navigate("about"))
-                );
+                new MenuItem("About ...", () -> UI.getCurrent().navigate("about")));
 
         this.add(app);
     }
