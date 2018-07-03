@@ -13,10 +13,12 @@ import com.flowingcode.fixture.view.util.MatchUpdater;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @SuppressWarnings("serial")
 @Route(value = "", layout = MainLayout.class)
+@PageTitle(value = MainLayout.SITE_TITLE)
 public class WelcomeScreen extends VerticalLayout {
 
     private final WelcomePresenter presenter;

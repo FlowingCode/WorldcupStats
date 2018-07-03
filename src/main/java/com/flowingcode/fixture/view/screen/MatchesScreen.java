@@ -18,10 +18,12 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @SuppressWarnings("serial")
 @Route(value = "matches", layout = MainLayout.class)
+@PageTitle(value = MainLayout.SITE_TITLE)
 public class MatchesScreen extends VerticalLayout {
 
     private final MatchesPresenter presenter;

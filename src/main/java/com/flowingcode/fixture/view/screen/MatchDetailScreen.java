@@ -24,10 +24,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @SuppressWarnings("serial")
 @Route(value = "detail", layout = MainLayout.class)
+@PageTitle(value = MainLayout.SITE_TITLE)
 public class MatchDetailScreen extends VerticalLayout implements HasUrlParameter<String> {
 
     private String matchId;

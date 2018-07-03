@@ -9,10 +9,12 @@ import com.flowingcode.fixture.view.model.GroupDto;
 import com.flowingcode.fixture.view.presenter.GroupsPresenter;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @SuppressWarnings("serial")
 @Route(value = "groups", layout = MainLayout.class)
+@PageTitle(value = MainLayout.SITE_TITLE)
 public class GroupsScreen extends VerticalLayout {
 
     private final VerticalLayout groupsContainer = new VerticalLayout();
@@ -26,7 +28,7 @@ public class GroupsScreen extends VerticalLayout {
 
         groupsContainer.setPadding(false);
         groupsContainer.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
- 
+
         this.add(groupsContainer);
     }
 

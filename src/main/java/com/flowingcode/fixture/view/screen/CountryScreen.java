@@ -19,10 +19,12 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @SuppressWarnings("serial")
 @Route(value = CountryScreen.COUNTRY_ROUTE, layout = MainLayout.class)
+@PageTitle(value = MainLayout.SITE_TITLE)
 public class CountryScreen extends VerticalLayout implements HasUrlParameter<String> {
 
     public static final String COUNTRY_ROUTE = "country";

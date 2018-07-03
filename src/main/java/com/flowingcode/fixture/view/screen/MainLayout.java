@@ -21,9 +21,11 @@ import com.vaadin.flow.shared.ui.LoadMode;
  */
 @SuppressWarnings("serial")
 @HtmlImport(value = "styles/shared-styles.html", loadMode = LoadMode.INLINE)
-@PageTitle("World Cup 2018 Stats - by Flowing Code S.A.")
 @Push
+@PageTitle(value = MainLayout.SITE_TITLE)
 public class MainLayout extends VerticalLayout implements RouterLayout, PageConfigurator {
+
+    public static final String SITE_TITLE = "World Cup 2018 Stats - Flowing Code S.A.";
 
     @Autowired
     private MatchUpdater matchUpdater;
