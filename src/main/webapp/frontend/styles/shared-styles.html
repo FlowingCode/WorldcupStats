@@ -1,0 +1,251 @@
+<custom-style>
+    <!-- This is where your App's styling should go. You can use .css files too. -->
+    <style>
+    	html {
+    		--lumo-primary-color: #78079B;
+    	}
+    
+    	.hidden {
+    		display: none;
+    	}
+    
+        .main-layout {
+        }
+        
+        .group{
+	        box-shadow: 0 1px 6px rgba(32,33,36,0.28);
+		}
+		
+		a { 
+			color: inherit; 
+		}
+		
+		.group-container{
+			display: table;
+		}
+        
+        .group-title{
+        	font-size: 16px;
+        }
+        
+        .group label.stat{
+        	text-align: center;
+        	padding: 0 10px;
+        }
+        
+        .group label.stat-hidden{
+        }
+        
+        .group .team{
+        	width: 100%;
+        }
+        
+        .group-header{
+        	color: rgba(0,0,0,.54);
+        	display: table-row;
+        }
+        
+        .group-detail-container{
+        	border-bottom: 1px solid #DFE1E5;
+        	width: 100%;
+        	display: table-row;
+        	height: 36px;
+        }
+        
+        .group-detail-container label, a{
+        	display: table-cell;
+        	padding: 0 8px;
+        }
+        
+        .logo{
+        	width: 24px;
+        	line-height: 34px;
+			vertical-align: middle;
+        }
+        
+        .logo-result-card {
+        	width: 80px;
+        	line-height: 50px;
+			vertical-align: middle;
+        }
+              
+        .align-items-center {
+        	align-items: center;
+        }
+        
+        .results-numbers-font-style {
+        	font-size: 30px;
+    		font-weight: 800;
+        }
+        
+        .font-bold {
+        	font-weight: bold;
+        }
+        
+        .text-align-left {
+       		text-align: left;
+        }
+        
+        .text-align-right {
+        	text-align: right;
+        }
+        
+        .text-align-center {
+        	text-align: center;
+        }
+        
+       .centered {
+			text-align: center;
+		}        
+		
+		.title-card {
+		    margin-top: 0;
+    		text-align: center;
+    		margin-bottom: 0;
+		}
+		
+		.paading-lef-10px {
+			padding-left: 10px;
+		}
+		
+		html, body {
+			margin: 0;
+			font-family: 'Roboto', 'Noto', sans-serif;
+			-webkit-font-smoothing: antialiased;
+			background: #f1f1f1;
+			max-height: 368px;
+		}
+		
+		app-toolbar {
+		  background-color: #009100;
+		      color: #fff;
+		}
+		
+		app-drawer paper-item {
+			cursor: pointer;
+		}
+				
+		paper-icon-button {
+		  --paper-icon-button-ink-color: white;
+		}
+		
+		paper-icon-button + [main-title] {
+		  margin-left: 24px;
+		}
+		
+		paper-progress {
+		  display: block;
+		      width: 100%;
+		      --paper-progress-active-color: #78079B;
+		      --paper-progress-container-color: transparent;
+		}
+		
+		app-header {
+		  position: var(--layout-fixed-top_-_position); top: var(--layout-fixed-top_-_top); left: var(--layout-fixed-top_-_left); right: var(--layout-fixed-top_-_right);
+		      color: #fff;
+		      --app-header-background-rear-layer_-_background-color:  #ef6c00;;
+		      z-index: 500;
+		}
+		
+		paper-card.common-card {
+			width: 700px;
+		}
+		
+		app-drawer {
+		  --app-drawer-scrim-background: rgba(0, 100, 0, 0.2);
+		      --app-drawer-content-container_-_background-color:  #B0BEC5;
+		      z-index: 1000;
+		}
+		
+		.match-detail-header { @apply --paper-font-headline; }
+		
+		.match-playing {
+			color: #259b24;
+		}
+		
+		/* jumping dots animation */
+		.jumping-dots span {
+		  position: relative;
+		  bottom: 0px;
+		  -webkit-animation: jump 1500ms infinite;
+		  animation: jump 2s infinite;
+		}
+		.jumping-dots .dot-1{
+		  -webkit-animation-delay: 200ms;
+		  animation-delay: 200ms;
+		}
+		.jumping-dots .dot-2{
+		  -webkit-animation-delay: 400ms;
+		  animation-delay: 400ms;
+		}
+		.jumping-dots .dot-3{
+		  -webkit-animation-delay: 600ms;
+		  animation-delay: 600ms;
+		}
+		
+		@-webkit-keyframes jump {
+		  0%   {bottom: 0px;}
+		  20%  {bottom: 3px;}
+		  40%  {bottom: 0px;}
+		}
+		
+		@keyframes jump {
+		  0%   {bottom: 0px;}
+		  20%  {bottom: 3px;}
+		  40%  {bottom: 0px;}
+		}
+		/* jumping dots animation */
+		
+		/* Large devices (large desktops, 1200px and up) */
+		/* No media query since this is the default in Bootstrap */   
+		
+		/* Medium devices (desktops, 992px and up) */
+		@media (max-width: 1200px) {
+		}     
+			
+		/* Small devices (tablets, 768px and up) */
+		@media (max-width: 992px) {
+		}
+        
+        /* Extra small devices (phones, less than 768px) */
+		@media (max-width: 767px) { 
+		
+			a { 
+				color: inherit;
+				text-decoration: none !important; 
+			}
+		
+			paper-card.common-card {
+				width: 100%;
+			}
+		
+			.group{
+				font-size: 14px;
+			}
+		
+			.group div.team{
+	        	width: 100%;
+	        	font-size: 14px;
+	        }
+	        
+	        .group-header{
+        		font-size: 12px; 
+        	}
+        	
+        	.group label.stat{
+        		text-align: center;
+        		padding: 0 6px;
+        	}
+	        
+	        .group label.stat-hidden{
+        		display: none;
+        	}
+        	
+        	.logo-result-card {
+                width: 40px;
+            }
+		}
+		
+        
+    </style>
+</custom-style>

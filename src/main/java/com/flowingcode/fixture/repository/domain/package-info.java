@@ -1,0 +1,1 @@
+package com.flowingcode.fixture.repository.domain;

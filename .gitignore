@@ -1,0 +1,6 @@
+/target
+/.project
+/.settings
+/.classpath
+/src/main/webapp/frontend-es6
+/src/main/webapp/frontend-es5
