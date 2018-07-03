@@ -211,7 +211,7 @@ public class MatchResultComponent extends PaperCard {
     }
 
     public void refresh(final MatchResume matchResume) {
-        if (this.matchResume.equals(matchResume)) {
+        if (this.matchResume.getFifaId().equals(matchResume.getFifaId())) {
             matchDateRight.setText(getMatchDateRight(matchResume));
             homeTeamGoals.setText(matchResume.getHomeTeamGoals());
             awayTeamGoals.setText(matchResume.getAwayTeamGoals());
