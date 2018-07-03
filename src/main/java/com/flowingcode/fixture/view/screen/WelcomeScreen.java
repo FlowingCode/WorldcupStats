@@ -41,10 +41,19 @@ public class WelcomeScreen extends VerticalLayout {
     }
 
     public void init(final List<MatchResultDto> results) {
-        final List<MatchResultDto> completedMatches = results.stream().filter(m -> !MatchStatus.FUTURE.equals(m.getStatus())).collect(Collectors.toList());
+        final List<MatchResultDto> completedMatches = results.stream().filter(m -> MatchStatus.COMPLETED.equals(m.getStatus())).collect(Collectors.toList());
         if (!completedMatches.isEmpty()) {
             this.add(new H3("Completed matches"));
             for (final MatchResultDto result : completedMatches) {
+                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, matchUpdater);
+                this.add(matchResultComponent);
+            }
+        }
+
+        final List<MatchResultDto> currentMatches = results.stream().filter(m -> MatchStatus.IN_PROGRESS.equals(m.getStatus())).collect(Collectors.toList());
+        if (!currentMatches.isEmpty()) {
+            this.add(new H3("Current matches"));
+            for (final MatchResultDto result : currentMatches) {
                 final MatchResultComponent matchResultComponent = new MatchResultComponent(result, matchUpdater);
                 this.add(matchResultComponent);
             }
