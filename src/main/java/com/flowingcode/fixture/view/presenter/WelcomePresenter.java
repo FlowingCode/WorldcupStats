@@ -26,7 +26,7 @@ public class WelcomePresenter {
     }
 
     public void loadResults() {
-        view.init(matchService.getFutureMatches(LocalDate.now(), LocalDate.of(2018, 7, 31)));
+        view.init(matchService.getFutureMatches(LocalDate.of(2018, 7, 6), LocalDate.of(2018, 7, 31)));
     }
 
 }
