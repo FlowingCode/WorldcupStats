@@ -1,4 +1,4 @@
-# Demo Application: World Cup Rusia 2018 stats
+# Demo Application: World Cup Qatar 2020 stats
 
 This project is a demo application that displays statistical data from the Football World Cup that is taking place in Qatar 2020
 
