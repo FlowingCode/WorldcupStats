@@ -1,6 +1,6 @@
 # Demo Application: World Cup Qatar 2022 stats
 
-This project is a demo application that displays statistical data from the Football World Cup that is taking place in Qatar
+This project is a demo application that displays statistical data from the Football World Cup that is taking place in Doha, Qatar
 
 Import the project to the IDE of your choosing as a Maven project. 
 
