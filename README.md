@@ -1,6 +1,6 @@
 # Demo Application: World Cup Rusia 2018 stats
 
-This project is a demo application that displays statistical data from the Football World Cup that is taking place in Russia
+This project is a demo application that displays statistical data from the Football World Cup that is taking place in Qatar 2020
 
 Import the project to the IDE of your choosing as a Maven project. 
 
