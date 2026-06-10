@@ -1,93 +1,88 @@
 package com.flowingcode.fixture.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.flowingcode.fixture.repository.MatchesRepository;
-import com.flowingcode.fixture.repository.TeamRepository;
-import com.flowingcode.fixture.repository.domain.Match;
-import com.flowingcode.fixture.repository.domain.Match.Team;
-import com.flowingcode.fixture.repository.domain.Match.Team_event;
-import com.flowingcode.fixture.repository.domain.Match.Team_statistics;
+import com.flowingcode.fixture.repository.domain.TeamEventType;
+import com.flowingcode.fixture.repository.worldcup.Wc26Dtos.Game;
+import com.flowingcode.fixture.repository.worldcup.Wc26Dtos.Team;
+import com.flowingcode.fixture.repository.worldcup.StadiumCatalog;
+import com.flowingcode.fixture.repository.worldcup.TeamCatalog;
+import com.flowingcode.fixture.repository.worldcup.WorldCupClient;
 import com.flowingcode.fixture.view.enums.MatchStatus;
 import com.flowingcode.fixture.view.model.MatchDetailDto;
 import com.flowingcode.fixture.view.model.MatchResultDto;
 import com.flowingcode.fixture.view.model.TeamDto;
 import com.flowingcode.fixture.view.model.TeamEventDto;
-import com.flowingcode.fixture.view.model.TeamStatisticsDto;
 
 @Service
 public class MatchServiceImpl implements MatchService {
 
-    private static final String FUTURE = "future";
+    private static final DateTimeFormatter LOCAL_DATE = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
-    private static final String COMPLETED = "completed";
+    /** Host-region timezone used to interpret the API's local kick-off times. */
+    private static final ZoneId ZONE = ZoneId.of("America/New_York");
 
-    private static final String IN_PROGRESS = "in progress";
+    private static final String NULL = "null";
 
-    private static final String FULL_TIME = "full-time";
+    private final WorldCupClient client;
 
-    private static final Predicate<Match> IS_IN_PROGRESS = match -> IN_PROGRESS.equals(match.status) && !FULL_TIME.equals(match.time);
+    private final TeamCatalog teamCatalog;
 
-    private static final Predicate<Match> IS_COMPLETED = match -> COMPLETED.equals(match.status) || FULL_TIME.equals(match.time);
-
-    private static final Predicate<Match> IS_FUTURE = match -> FUTURE.equals(match.status);
-
-    @Autowired
-    private MatchesRepository matchesRepository;
-
-    @Autowired
-    private TeamRepository teamRepository;
-
-    private Map<String, String> countryGroupMap;
+    private final StadiumCatalog stadiumCatalog;
 
     private volatile List<LocalDate> matchDates;
+
+    public MatchServiceImpl(final WorldCupClient client, final TeamCatalog teamCatalog, final StadiumCatalog stadiumCatalog) {
+        this.client = client;
+        this.teamCatalog = teamCatalog;
+        this.stadiumCatalog = stadiumCatalog;
+    }
 
     @Override
     @Cacheable("matches")
     public List<MatchResultDto> getMatches() {
-        return matchesRepository.getMatches().stream().map(this::convert).collect(Collectors.toList());
+        return client.getGames().stream().map(this::convert).collect(Collectors.toList());
     }
 
     @Override
     public List<MatchResultDto> getCurrentMatches() {
-        return matchesRepository.getCurrentMatches().stream().map(this::convert).collect(Collectors.toList());
+        return client.getGames().stream().filter(this::isInProgress).map(this::convert).collect(Collectors.toList());
     }
 
-    protected MatchResultDto convert(final Match source) {
+    protected MatchResultDto convert(final Game source) {
         final MatchResultDto target = new MatchResultDto();
-        target.setAwayTeam(source.away_team.country);
-        target.setAwayTeamFlag(FlagUtils.getFlagForFifaCode(source.away_team.code));
-        target.setAwayTeamGoals(String.valueOf(source.away_team.goals));
-        target.setAwayTeamCode(source.away_team.code);
-        target.setHomeTeam(source.home_team.country);
-        target.setHomeTeamFlag(FlagUtils.getFlagForFifaCode(source.home_team.code));
-        target.setHomeTeamGoals(String.valueOf(source.home_team.goals));
-        target.setHomeTeamCode(source.home_team.code);
-        target.setKickoff(source.datetime);
-        target.setStage(source.location);
-        target.setFifaId(source.fifa_id);
-        target.setGroupName(getGroup(source.away_team.code));
-        target.setStageName(source.stage_name);
-        if (IS_IN_PROGRESS.test(source)) {
-            target.setStatus(MatchStatus.IN_PROGRESS);
-            target.setMinutes(source.time);
-        }
-        if (IS_COMPLETED.test(source)) {
-            target.setStatus(MatchStatus.COMPLETED);
-        }
-        if (IS_FUTURE.test(source)) {
-            target.setStatus(MatchStatus.FUTURE);
+        final ZonedDateTime kickoff = parseKickoff(source);
+        target.setHomeTeam(teamName(source.home_team_id(), source.home_team_name_en()));
+        target.setAwayTeam(teamName(source.away_team_id(), source.away_team_name_en()));
+        target.setHomeTeamCode(teamCatalog.codeById(source.home_team_id()));
+        target.setAwayTeamCode(teamCatalog.codeById(source.away_team_id()));
+        target.setHomeTeamFlag(teamCatalog.flagById(source.home_team_id()));
+        target.setAwayTeamFlag(teamCatalog.flagById(source.away_team_id()));
+        target.setHomeTeamGoals(goals(source.home_score()));
+        target.setAwayTeamGoals(goals(source.away_score()));
+        target.setKickoff(kickoff);
+        target.setStage(stage(source));
+        target.setStageName(stageName(source));
+        target.setGroupName(source.group());
+        target.setFifaId(source.id());
+        final MatchStatus status = status(source, kickoff);
+        target.setStatus(status);
+        if (status == MatchStatus.IN_PROGRESS) {
+            target.setMinutes(source.time_elapsed());
         }
         return target;
     }
@@ -95,117 +90,211 @@ public class MatchServiceImpl implements MatchService {
     @Override
     @Cacheable("matchDetail")
     public Optional<MatchDetailDto> getByFifaId(final String fifaId) {
-        return matchesRepository.getByFifaID(fifaId).map(this::convertToDetail);
+        return client.getGames().stream().filter(g -> fifaId.equals(g.id())).findFirst().map(this::convertToDetail);
     }
 
-    protected MatchDetailDto convertToDetail(final Match source) {
+    protected MatchDetailDto convertToDetail(final Game source) {
         final MatchDetailDto target = new MatchDetailDto();
-        target.setAwayTeamDto(createTeamDto(source.away_team));
-        target.setAwayTeamEvents(source.away_team_events.stream().map(this::createTeamEventDto).collect(Collectors.toList()));
-        target.setAwayTeamStatistics(createTeamsStatisticsDto(source.away_team_statistics));
-        target.setHomeTeamDto(createTeamDto(source.home_team));
-        target.setHomeTeamEvents(source.home_team_events.stream().map(this::createTeamEventDto).collect(Collectors.toList()));
-        target.setHomeTeamStatistics(createTeamsStatisticsDto(source.home_team_statistics));
-        target.setDateTime(source.datetime);
-        target.setId(source.fifa_id);
-        target.setLocation(source.location);
-        target.setVenue(source.venue);
-        target.setGroup(getGroup(source.away_team.code));
-        target.setStageName(source.stage_name);
-        if (IS_IN_PROGRESS.test(source)) {
-            target.setStatus(MatchStatus.IN_PROGRESS);
-            target.setMinutes(source.time);
+        final ZonedDateTime kickoff = parseKickoff(source);
+        target.setHomeTeamDto(createTeamDto(source.home_team_id(), source.home_team_name_en(), source.home_score()));
+        target.setAwayTeamDto(createTeamDto(source.away_team_id(), source.away_team_name_en(), source.away_score()));
+        target.setHomeTeamEvents(scorerEvents(source.home_scorers()));
+        target.setAwayTeamEvents(scorerEvents(source.away_scorers()));
+        target.setDateTime(kickoff);
+        target.setId(source.id());
+        target.setVenue(stadiumCatalog.venueById(source.stadium_id()));
+        target.setLocation(stadiumCatalog.cityById(source.stadium_id()));
+        target.setGroup(source.group());
+        target.setStageName(stageName(source));
+        final MatchStatus status = status(source, kickoff);
+        target.setStatus(status);
+        if (status == MatchStatus.IN_PROGRESS) {
+            target.setMinutes(source.time_elapsed());
         }
-        if (IS_COMPLETED.test(source)) {
-            target.setStatus(MatchStatus.COMPLETED);
-        }
-        if (IS_FUTURE.test(source)) {
-            target.setStatus(MatchStatus.FUTURE);
-        }
-        target.setTime(source.time);
-        target.setWinner(source.winner);
-        target.setWinnerCode(source.winner_code);
+        target.setTime(source.time_elapsed());
         return target;
     }
 
-    protected TeamDto createTeamDto(final Team source) {
+    protected TeamDto createTeamDto(final String teamId, final String nameEn, final String score) {
         final TeamDto target = new TeamDto();
-        target.setCode(source.code);
-        target.setCountry(source.country);
-        target.setGoals(String.valueOf(source.goals));
+        target.setCode(teamCatalog.codeById(teamId));
+        target.setCountry(teamName(teamId, nameEn));
+        target.setGoals(goals(score));
         return target;
     }
 
-    protected TeamEventDto createTeamEventDto(final Team_event source) {
-        final TeamEventDto target = new TeamEventDto();
-        target.setId(String.valueOf(source.id));
-        target.setPlayer(source.player);
-        target.setTime(source.time);
-        target.setTypeOfEvent(source.type_of_event);
-        return target;
-    }
-
-    protected TeamStatisticsDto createTeamsStatisticsDto(final Team_statistics source) {
-        final TeamStatisticsDto target = new TeamStatisticsDto();
-        target.setAttemptsOnGoal(source.attempts_on_goal);
-        target.setBallPossession(source.ball_possession);
-        target.setBallsRecovered(source.balls_recovered);
-        target.setBlocked(source.blocked);
-        target.setClearances(source.clearances);
-        target.setCorners(source.corners);
-        target.setCountry(source.country);
-        target.setDistanceCovered(source.distance_covered);
-        target.setFoulsCommitted(source.fouls_committed);
-        target.setNumPasses(source.num_passes);
-        target.setOffsides(source.offsides);
-        target.setOffTarget(source.off_target);
-        target.setOnTarget(source.on_target);
-        target.setPassAccuracy(source.pass_accuracy);
-        target.setPassesCompleted(source.passes_completed);
-        target.setRedCards(source.red_cards);
-        target.setTackles(source.tackles);
-        target.setWoodwork(source.woodwork);
-        target.setYellowCards(source.yellow_cards);
-        return target;
+    /** worldcup26.ir only exposes goal scorers (as a name list), not full event feeds. */
+    private List<TeamEventDto> scorerEvents(final String scorers) {
+        final List<TeamEventDto> events = new ArrayList<>();
+        if (scorers == null || scorers.isBlank() || NULL.equalsIgnoreCase(scorers)) {
+            return events;
+        }
+        for (final String name : scorers.split(",")) {
+            final String player = name.trim();
+            if (player.isEmpty()) {
+                continue;
+            }
+            final TeamEventDto event = new TeamEventDto();
+            event.setTypeOfEvent(TeamEventType.GOAL);
+            event.setPlayer(player);
+            event.setTime("");
+            event.setId(player);
+            events.add(event);
+        }
+        return events;
     }
 
     @Override
     @Cacheable("matchesByCountry")
     public List<MatchResultDto> getByCountryCode(final String fifaCode) {
-        return matchesRepository.getByCountryCode(fifaCode).stream().map(this::convert).collect(Collectors.toList());
-    }
-
-    protected String getGroup(final String countryCode) {
-        if (countryGroupMap == null) {
-            countryGroupMap = teamRepository.getTeams().stream().collect(Collectors.toMap(t -> t.fifa_code, t -> t.group_letter));
+        final Team team = teamCatalog.byCode(fifaCode);
+        if (team == null) {
+            return Collections.emptyList();
         }
-        return countryGroupMap.get(countryCode);
+        final String id = team.id();
+        return client.getGames().stream()
+                .filter(g -> id.equals(g.home_team_id()) || id.equals(g.away_team_id()))
+                .map(this::convert).collect(Collectors.toList());
     }
 
     @Override
     @Cacheable("futureMatches")
     public List<MatchResultDto> getFutureMatches(final LocalDate startDate, final LocalDate endDate) {
-        return matchesRepository.getMatches(startDate, endDate).stream().filter(m -> !m.home_team.code.equals("TBD") || !m.away_team.code.equals("TBD"))
-                .map(this::convert).collect(Collectors.toList());
+        return client.getGames().stream().map(this::convert)
+                .filter(m -> {
+                    final LocalDate date = m.getKickoff().toLocalDate();
+                    return !date.isBefore(startDate) && !date.isAfter(endDate);
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<LocalDate> getMatchDates() {
         if (matchDates == null) {
-            final List<LocalDate> matchDates = matchesRepository.getMatches().stream()
-                    .map(m -> m.datetime)
+            this.matchDates = Collections.unmodifiableList(client.getGames().stream()
+                    .map(this::parseKickoff)
                     .map(ZonedDateTime::toLocalDate)
                     .sorted()
                     .distinct()
-                    .collect(Collectors.toList());
-            this.matchDates = Collections.unmodifiableList(matchDates);
+                    .collect(Collectors.toList()));
         }
         return matchDates;
     }
 
     @Override
     public List<MatchResultDto> getMatchesByDate(final LocalDate date) {
-        return matchesRepository.getMatches(date, date).stream().map(this::convert).collect(Collectors.toList());
+        return client.getGames().stream().map(this::convert)
+                .filter(m -> m.getKickoff().toLocalDate().equals(date))
+                .collect(Collectors.toList());
+    }
+
+    // --- helpers -------------------------------------------------------------
+
+    private String teamName(final String teamId, final String nameEn) {
+        return nameEn != null && !nameEn.isBlank() ? nameEn : teamCatalog.nameById(teamId);
+    }
+
+    private ZonedDateTime parseKickoff(final Game source) {
+        try {
+            return LocalDateTime.parse(source.local_date(), LOCAL_DATE).atZone(ZONE);
+        } catch (final RuntimeException e) {
+            return ZonedDateTime.now(ZONE);
+        }
+    }
+
+    private boolean isFinished(final Game source) {
+        return "TRUE".equalsIgnoreCase(source.finished());
+    }
+
+    private boolean isInProgress(final Game source) {
+        if (isFinished(source)) {
+            return false;
+        }
+        final String elapsed = source.time_elapsed();
+        return elapsed != null && !elapsed.isBlank() && !"notstarted".equalsIgnoreCase(elapsed);
+    }
+
+    private MatchStatus status(final Game source, final ZonedDateTime kickoff) {
+        if (isFinished(source)) {
+            return MatchStatus.COMPLETED;
+        }
+        if (isInProgress(source)) {
+            return MatchStatus.IN_PROGRESS;
+        }
+        if (kickoff.toLocalDate().equals(LocalDate.now())) {
+            return MatchStatus.TODAY;
+        }
+        return MatchStatus.FUTURE;
+    }
+
+    private String goals(final String score) {
+        return score == null || NULL.equalsIgnoreCase(score) ? "0" : score;
+    }
+
+    private boolean isGroupStage(final Game source) {
+        return source.type() == null || "group".equalsIgnoreCase(source.type());
+    }
+
+    private String stageName(final Game source) {
+        return isGroupStage(source) ? "First stage" : prettyStage(source.type());
+    }
+
+    private String stage(final Game source) {
+        return isGroupStage(source) ? "Matchday " + source.matchday() : stageName(source);
+    }
+
+    private static final Pattern ROUND_OF = Pattern.compile("(?i)round[\\s_-]*(?:of)?[\\s_-]*(\\d+)");
+
+    /**
+     * Maps the API's {@code type} value to a human-readable stage name. It is
+     * data-driven: known knockout stages get canonical labels, and any other
+     * value (including ones not yet seen, since the API currently only returns
+     * "group") is humanized rather than hardcoded — so it renders sensibly the
+     * moment knockout fixtures appear, with no code change required.
+     */
+    private String prettyStage(final String type) {
+        final String trimmed = type.trim();
+        final Matcher round = ROUND_OF.matcher(trimmed);
+        if (round.matches()) {
+            return "Round of " + round.group(1);
+        }
+        switch (trimmed.toLowerCase().replaceAll("[\\s_-]", "")) {
+            case "quarter":
+            case "quarterfinal":
+            case "quarterfinals":
+                return "Quarter-finals";
+            case "semi":
+            case "semifinal":
+            case "semifinals":
+                return "Semi-finals";
+            case "third":
+            case "thirdplace":
+                return "Third place";
+            case "final":
+                return "Final";
+            default:
+                return humanize(trimmed);
+        }
+    }
+
+    /** Turns an arbitrary token ("roundOf16", "quarter_final", "play-off") into "Title Case Words". */
+    private String humanize(final String value) {
+        final String spaced = value
+                .replaceAll("([a-z])([A-Z])", "$1 $2")
+                .replaceAll("([A-Za-z])(\\d)", "$1 $2")
+                .replaceAll("[_-]+", " ")
+                .trim();
+        final StringBuilder builder = new StringBuilder();
+        for (final String word : spaced.split("\\s+")) {
+            if (word.isEmpty()) {
+                continue;
+            }
+            if (builder.length() > 0) {
+                builder.append(' ');
+            }
+            builder.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1).toLowerCase());
+        }
+        return builder.length() == 0 ? value : builder.toString();
     }
 
 }

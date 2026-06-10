@@ -1,16 +1,53 @@
-# Demo Application: World Cup Rusia 2018 stats
+# Demo Application: Global Football 2026 Stats
 
-This project is a demo application that displays statistical data from the Football World Cup that is taking place in Russia
+A demo application that displays the fixture and results of the **2026 international football
+tournament** (Canada / USA / Mexico): match schedule, live scores, group standings and
+per-country fixtures.
 
-Import the project to the IDE of your choosing as a Maven project. 
+It is the modernized version of the original 2018 demo, migrated from Vaadin 10 to **Vaadin 25**.
+See [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for the full upgrade story.
 
-Run application using
-`mvn spring-boot:run`
+## Tech stack
 
-Open http://localhost:8080/ in browser
+- **Vaadin 25.1.7** (Lit / npm frontend, plain-CSS theming via `@StyleSheet`)
+- **Spring Boot 4.0.6**, **Java 21**, executable-jar packaging
+- **Flowing Code AppLayout add-on** for the navigation shell
+- **Caffeine** for short-lived response caching
 
-For more information regarding this application, refer to [this blog post](https://www.flowingcode.com/2018/07/vaadin-10-spring-demo-application-world.html).
+## Data source
 
-For more information on Vaadin Flow, visit https://vaadin.com/flow.
+Data comes from the free, no-API-key **[worldcup26.ir](https://worldcup26.ir/)** REST API
+(teams, groups/standings, games, stadiums). Because it is a free source, rich per-match
+statistics (lineups, possession, cards) are not available — the app shows fixtures, scores,
+goal scorers and group standings. Live scores update during matches.
 
-This demo is hosted at http://worldcup.flowingcode.com/
+## Running
+
+Development mode (hot reload):
+
+```
+mvn spring-boot:run
+```
+
+Then open <http://localhost:8080>.
+
+Production build (compiles the optimized frontend bundle and a runnable jar):
+
+```
+mvn -Pproduction package
+java -jar target/worldcup-fixture-2.0.0-SNAPSHOT.jar
+```
+
+## More information
+
+For more information on Vaadin Flow, visit <https://vaadin.com/flow>.
+
+## Disclaimer
+
+Unofficial demo application. Not affiliated with, endorsed by, or sponsored by FIFA or any
+football governing body. All team and tournament data comes from the public
+[worldcup26.ir](https://worldcup26.ir/) API.
+
+## Author
+
+Developed by [Flowing Code](https://www.flowingcode.com).

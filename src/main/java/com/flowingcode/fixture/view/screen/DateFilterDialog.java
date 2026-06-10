@@ -2,9 +2,6 @@ package com.flowingcode.fixture.view.screen;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.function.Consumer;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -12,12 +9,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.flowingcode.fixture.service.MatchService;
-import com.flowingcode.fixture.view.presenter.MatchesPresenter;
 import com.flowingcode.fixture.view.util.DateTimeUtil;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.function.SerializableConsumer;
@@ -35,7 +31,7 @@ public class DateFilterDialog  {
 	public DateFilterDialog(@Autowired MatchService matchService) {
 		dialog = new Dialog();
 		VerticalLayout layout = new VerticalLayout();
-		layout.add(new Label("Filter by date"));
+		layout.add(new Span("Filter by date"));
 		combobox = new ComboBox<>();
 		combobox.setItems(matchService.getMatchDates());
 		combobox.setItemLabelGenerator(DateTimeUtil::styleDate);

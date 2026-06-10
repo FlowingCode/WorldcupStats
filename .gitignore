@@ -2,5 +2,17 @@
 /.project
 /.settings
 /.classpath
-/src/main/webapp/frontend-es6
-/src/main/webapp/frontend-es5
+node_modules
+
+# IDE
+/.vscode/
+
+# Vaadin — generated / auto-scaffolded on build (regenerated, not source)
+/src/main/frontend/
+/src/main/bundles/
+package.json
+package-lock.json
+tsconfig.json
+types.d.ts
+vite.config.ts
+vite.generated.ts

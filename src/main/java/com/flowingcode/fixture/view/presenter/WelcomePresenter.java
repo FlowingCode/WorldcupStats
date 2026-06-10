@@ -26,7 +26,8 @@ public class WelcomePresenter {
     }
 
     public void loadResults() {
-        view.init(matchService.getFutureMatches(LocalDate.of(2018, 7, 6), LocalDate.of(2018, 7, 31)));
+        // Opening matchdays of the 2026 tournament (runs Jun 11 - Jul 19, 2026).
+        view.init(matchService.getFutureMatches(LocalDate.of(2026, 6, 11), LocalDate.of(2026, 6, 15)));
     }
 
 }
