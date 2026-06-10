@@ -1,14 +1,14 @@
 package com.flowingcode.fixture.view.component;
 
-import com.flowingcode.addons.applayout.PaperCard;
 import com.flowingcode.fixture.view.util.CssStyles;
+import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.function.SerializableRunnable;
 
 @SuppressWarnings("serial")
-public class TitleComponent extends PaperCard {
+public class TitleComponent extends Card {
 
     private final SerializableRunnable searchListener;
 
@@ -27,7 +27,7 @@ public class TitleComponent extends PaperCard {
             addSearchIcon(title);
         }
 
-        setCardContent(title);
+        add(title);
     }
 
     private void addSearchIcon(final H3 title) {

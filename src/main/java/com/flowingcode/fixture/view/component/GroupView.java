@@ -1,49 +1,48 @@
 package com.flowingcode.fixture.view.component;
 
-import com.flowingcode.addons.applayout.PaperCard;
 import com.flowingcode.fixture.view.model.GroupDetailDto;
 import com.flowingcode.fixture.view.model.GroupDto;
 import com.flowingcode.fixture.view.screen.CountryScreen;
-import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-public class GroupView extends PaperCard {
+@SuppressWarnings("serial")
+public class GroupView extends Card {
 
-    final Label groupName = new Label();
+    final NativeLabel groupName = new NativeLabel();
 
     final VerticalLayout groupContainer = new VerticalLayout();
 
     public GroupView() {
         addClassName("group");
         addClassName("common-card");
-        setPadding(false);
 
-        final Label position = new Label("Pos");
+        final NativeLabel position = new NativeLabel("Pos");
         position.addClassName("stat");
-        final Label logo = new Label();
+        final NativeLabel logo = new NativeLabel();
         logo.addClassName("logo");
-        final Label team = new Label("Team");
+        final NativeLabel team = new NativeLabel("Team");
         team.addClassName("team");
-        final Label matchesPlayed = new Label("MP");
+        final NativeLabel matchesPlayed = new NativeLabel("MP");
         matchesPlayed.addClassName("stat");
-        final Label won = new Label("W");
+        final NativeLabel won = new NativeLabel("W");
         won.addClassNames("stat", "stat-hidden");
-        final Label drawn = new Label("D");
+        final NativeLabel drawn = new NativeLabel("D");
         drawn.addClassNames("stat", "stat-hidden");
-        final Label lost = new Label("L");
+        final NativeLabel lost = new NativeLabel("L");
         lost.addClassNames("stat", "stat-hidden");
-        final Label goalDifference = new Label("GD");
+        final NativeLabel goalDifference = new NativeLabel("GD");
         goalDifference.addClassNames("stat", "stat-hidden");
-        final Label goalsFor = new Label("GF");
+        final NativeLabel goalsFor = new NativeLabel("GF");
         goalsFor.addClassName("stat");
-        final Label goalsAgainst = new Label("GA");
+        final NativeLabel goalsAgainst = new NativeLabel("GA");
         goalsAgainst.addClassName("stat");
-        final Label points = new Label("Pts");
+        final NativeLabel points = new NativeLabel("Pts");
         points.addClassName("stat");
 
         final HorizontalLayout groupHeader = new HorizontalLayout(position, logo, team, matchesPlayed, won, drawn, lost, goalDifference, goalsFor,
@@ -60,7 +59,7 @@ public class GroupView extends PaperCard {
         final VerticalLayout cardContent = new VerticalLayout(groupName, groupContainer);
         cardContent.setMargin(false);
         cardContent.setPadding(false);
-        setCardContent(cardContent);
+        add(cardContent);
     }
 
     public void init(final GroupDto group) {
@@ -75,29 +74,29 @@ public class GroupView extends PaperCard {
     }
 
     private HorizontalLayout buildGroupDetail(final GroupDetailDto group) {
-        final Label positionLabel = new Label(group.getPosition() == null ? "" : group.getPosition() + "");
+        final NativeLabel positionLabel = new NativeLabel(group.getPosition() == null ? "" : group.getPosition() + "");
         positionLabel.addClassName("stat");
 
         final Image logo = new Image(group.getTeamLogo(), group.getTeamName());
         logo.addClassName("logo");
-        final String route = UI.getCurrent().getRouter().getUrl(CountryScreen.class, group.getFifaCode());
+        final String route = "/" + CountryScreen.COUNTRY_ROUTE + "/" + group.getFifaCode();
         final Anchor team = new Anchor(route, group.getTeamName());
         team.addClassName("team");
-        final Label matchesPlayed = new Label(group.getMatchesPlayed() + "");
+        final NativeLabel matchesPlayed = new NativeLabel(group.getMatchesPlayed() + "");
         matchesPlayed.addClassName("stat");
-        final Label matchesWon = new Label(group.getMatchesWon() + "");
+        final NativeLabel matchesWon = new NativeLabel(group.getMatchesWon() + "");
         matchesWon.addClassNames("stat", "stat-hidden");
-        final Label matchesDrawn = new Label(group.getMatchesDrawn() + "");
+        final NativeLabel matchesDrawn = new NativeLabel(group.getMatchesDrawn() + "");
         matchesDrawn.addClassNames("stat", "stat-hidden");
-        final Label matchesLost = new Label(group.getMatchesLost() + "");
+        final NativeLabel matchesLost = new NativeLabel(group.getMatchesLost() + "");
         matchesLost.addClassNames("stat", "stat-hidden");
-        final Label goalDifference = new Label(group.getGoalDifference() + "");
+        final NativeLabel goalDifference = new NativeLabel(group.getGoalDifference() + "");
         goalDifference.addClassNames("stat", "stat-hidden");
-        final Label goalsFor = new Label(group.getGoalsFor() + "");
+        final NativeLabel goalsFor = new NativeLabel(group.getGoalsFor() + "");
         goalsFor.addClassName("stat");
-        final Label goalsAgainst = new Label(group.getGoalsAgainst() + "");
+        final NativeLabel goalsAgainst = new NativeLabel(group.getGoalsAgainst() + "");
         goalsAgainst.addClassName("stat");
-        final Label points = new Label(group.getPoints() + "");
+        final NativeLabel points = new NativeLabel(group.getPoints() + "");
         points.addClassName("stat");
         final HorizontalLayout detailContainer = new HorizontalLayout(positionLabel, logo, team, matchesPlayed, matchesWon, matchesDrawn, matchesLost,
                 goalDifference, goalsFor, goalsAgainst, points);

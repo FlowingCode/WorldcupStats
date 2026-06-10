@@ -14,7 +14,7 @@ import com.flowingcode.fixture.view.util.DateTimeUtil;
 import com.flowingcode.fixture.view.util.MatchUpdater;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -57,7 +57,7 @@ public class MatchesScreen extends VerticalLayout {
         searchIcon.addClassName(CssStyles.CLICKABLE);
         searchIcon.getElement().addEventListener("click", e -> dateFilterDialog.open(presenter::filterByDate));
 
-        this.add(new H3(new Label(titleCaption), searchIcon));
+        this.add(new H3(new NativeLabel(titleCaption), searchIcon));
 
         for (final MatchResultDto result : results) {
             final MatchResultComponent matchResultComponent = new MatchResultComponent(result, matchUpdater);

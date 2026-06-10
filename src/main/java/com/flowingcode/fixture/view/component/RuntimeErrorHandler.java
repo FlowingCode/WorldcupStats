@@ -1,6 +1,6 @@
 package com.flowingcode.fixture.view.component;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.flowingcode.fixture.infra.HasLogger;
 import com.flowingcode.fixture.view.screen.MainLayout;

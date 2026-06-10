@@ -4,8 +4,6 @@ import java.time.ZonedDateTime;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.flowingcode.addons.applayout.PaperCard;
-import com.flowingcode.addons.applayout.menu.MenuItem;
 import com.flowingcode.fixture.view.enums.MatchStatus;
 import com.flowingcode.fixture.view.model.MatchResume;
 import com.flowingcode.fixture.view.screen.CountryScreen;
@@ -16,16 +14,18 @@ import com.flowingcode.fixture.view.util.MatchUpdater;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 @SuppressWarnings("serial")
-public class MatchResultComponent extends PaperCard {
+public class MatchResultComponent extends Card {
 
     public static final String WIDTH_50 = "50%";
 
@@ -41,11 +41,11 @@ public class MatchResultComponent extends PaperCard {
 
     private static final String DETAILS_BUTTON_CAPTION = "Details";
 
-    final Label matchDateRight = new Label();
+    final NativeLabel matchDateRight = new NativeLabel();
 
-    final Label homeTeamGoals = new Label();
+    final NativeLabel homeTeamGoals = new NativeLabel();
 
-    final Label awayTeamGoals = new Label();
+    final NativeLabel awayTeamGoals = new NativeLabel();
 
     private final MatchResume matchResume;
 
@@ -64,11 +64,10 @@ public class MatchResultComponent extends PaperCard {
         this.matchUpdater = matchUpdater;
 
         addClassName("common-card");
-        setCardContent(createContent(dto));
+        add(createContent(dto));
         if (ZonedDateTime.now().compareTo(dto.getKickoff()) > 0 && showDetailsButton) {
-            setCardActions(new MenuItem(DETAILS_BUTTON_CAPTION, () -> {
-                UI.getCurrent().navigate(MatchDetailScreen.class, dto.getFifaId());
-            }));
+            addToFooter(new Button(DETAILS_BUTTON_CAPTION, e ->
+                    UI.getCurrent().navigate(MatchDetailScreen.class, dto.getFifaId())));
         }
     }
 
@@ -77,7 +76,7 @@ public class MatchResultComponent extends PaperCard {
         content.setId(DateTimeUtil.styleDate(dto.getKickoff()));
 
         // header: date & time
-        final Label matchDateLeft = new Label(getMatchDateLeft(dto));
+        final NativeLabel matchDateLeft = new NativeLabel(getMatchDateLeft(dto));
         matchDateLeft.addClassName("font-bold");
         matchDateRight.addClassName("font-bold");
 
@@ -105,7 +104,7 @@ public class MatchResultComponent extends PaperCard {
         homeTeamGoals.addClassName("results-numbers-font-style");
         homeTeamGoals.addClassName("text-align-center");
         homeTeamGoals.setWidth("12%");
-        final Label resultSeparator = new Label(SEPARATOR);
+        final NativeLabel resultSeparator = new NativeLabel(SEPARATOR);
         resultSeparator.addClassName("results-numbers-font-style");
         resultSeparator.addClassName("text-align-center");
         resultSeparator.setWidth("6%");
@@ -120,7 +119,8 @@ public class MatchResultComponent extends PaperCard {
 
         // match result
         final VerticalLayout homeTeamLayout = new VerticalLayout(homeTeamImage, homeTeamName);
-        homeTeamLayout.getElement().setAttribute("style", "margin:0px;width:35%");
+        homeTeamLayout.getStyle().set("margin", "0px");
+        homeTeamLayout.setWidth("35%");
         homeTeamLayout.addClassName("align-items-center");
         final VerticalLayout awayTeamLayout = new VerticalLayout(awayTeamImage, awayTeamName);
         awayTeamLayout.setWidth("35%");
@@ -140,21 +140,21 @@ public class MatchResultComponent extends PaperCard {
 
     private HorizontalLayout createFooterLayout(final MatchResume dto) {
         final HorizontalLayout footerLayout;
-        final Label stage = new Label(dto.getStage());
-        final Label footerSeparator = new Label(SEPARATOR);
-        final Label phase;
+        final NativeLabel stage = new NativeLabel(dto.getStage());
+        final NativeLabel footerSeparator = new NativeLabel(SEPARATOR);
+        final NativeLabel phase;
 
         if (StringUtils.isNotBlank(dto.getGroupName()) && "First stage".equals(dto.getStageName())) {
             stage.setWidth(WIDTH_50);
             stage.addClassName("text-align-right");
-            phase = new Label(GROUP_LABEL + dto.getGroupName());
+            phase = new NativeLabel(GROUP_LABEL + dto.getGroupName());
             phase.setWidth(WIDTH_50);
             phase.addClassName("text-align-left");
             footerLayout = new HorizontalLayout(stage, footerSeparator, phase);
         } else if (StringUtils.isNotBlank(dto.getStageName())) {
             stage.setWidth(WIDTH_50);
             stage.addClassName("text-align-right");
-            phase = new Label(dto.getStageName());
+            phase = new NativeLabel(dto.getStageName());
             phase.setWidth(WIDTH_50);
             phase.addClassName("text-align-left");
             footerLayout = new HorizontalLayout(stage, footerSeparator, phase);

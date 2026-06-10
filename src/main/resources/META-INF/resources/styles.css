@@ -1,0 +1,209 @@
+html {
+    --lumo-primary-color: #78079B;
+}
+
+html, body {
+    margin: 0;
+    font-family: 'Roboto', 'Noto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: #f1f1f1;
+}
+
+.hidden {
+    display: none;
+}
+
+a {
+    color: inherit;
+}
+
+/* Real hyperlinks in the About view should look like links, not body text. */
+.about-content a {
+    color: var(--lumo-primary-color);
+    text-decoration: underline;
+}
+
+/* Group standings */
+.group {
+    box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+}
+
+.group-container {
+    display: table;
+}
+
+.group-title {
+    font-size: 16px;
+}
+
+.group label.stat {
+    text-align: center;
+    padding: 0 10px;
+}
+
+.group .team {
+    width: 100%;
+}
+
+.group-header {
+    color: rgba(0, 0, 0, .54);
+    display: table-row;
+}
+
+.group-detail-container {
+    border-bottom: 1px solid #DFE1E5;
+    width: 100%;
+    display: table-row;
+    height: 36px;
+}
+
+.group-detail-container label,
+.group-detail-container a {
+    display: table-cell;
+    padding: 0 8px;
+}
+
+/* Logos / flags */
+.logo {
+    width: 24px;
+    line-height: 34px;
+    vertical-align: middle;
+}
+
+.logo-result-card {
+    width: 80px;
+    line-height: 50px;
+    vertical-align: middle;
+}
+
+/* Helpers */
+.align-items-center {
+    align-items: center;
+}
+
+.results-numbers-font-style {
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.text-align-left {
+    text-align: left;
+}
+
+.text-align-right {
+    text-align: right;
+}
+
+.text-align-center {
+    text-align: center;
+}
+
+.centered {
+    text-align: center;
+}
+
+.title-card {
+    margin-top: 0;
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.padding-left-10 {
+    padding-left: 10px;
+}
+
+/* Cards (replaces former paper-card.common-card) */
+.common-card {
+    width: 700px;
+}
+
+.match-detail-header {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 32px;
+}
+
+.match-playing {
+    color: #259b24;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+/* jumping dots animation */
+.jumping-dots span {
+    position: relative;
+    bottom: 0px;
+    -webkit-animation: jump 1500ms infinite;
+    animation: jump 2s infinite;
+}
+
+.jumping-dots .dot-1 {
+    -webkit-animation-delay: 200ms;
+    animation-delay: 200ms;
+}
+
+.jumping-dots .dot-2 {
+    -webkit-animation-delay: 400ms;
+    animation-delay: 400ms;
+}
+
+.jumping-dots .dot-3 {
+    -webkit-animation-delay: 600ms;
+    animation-delay: 600ms;
+}
+
+@-webkit-keyframes jump {
+    0%   { bottom: 0px; }
+    20%  { bottom: 3px; }
+    40%  { bottom: 0px; }
+}
+
+@keyframes jump {
+    0%   { bottom: 0px; }
+    20%  { bottom: 3px; }
+    40%  { bottom: 0px; }
+}
+
+/* Extra small devices (phones, less than 768px) */
+@media (max-width: 767px) {
+    a {
+        color: inherit;
+        text-decoration: none !important;
+    }
+
+    .common-card {
+        width: 100%;
+    }
+
+    .group {
+        font-size: 14px;
+    }
+
+    .group div.team {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .group-header {
+        font-size: 12px;
+    }
+
+    .group label.stat {
+        text-align: center;
+        padding: 0 6px;
+    }
+
+    .group label.stat-hidden {
+        display: none;
+    }
+
+    .logo-result-card {
+        width: 40px;
+    }
+}

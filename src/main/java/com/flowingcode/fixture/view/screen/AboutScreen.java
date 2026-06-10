@@ -1,10 +1,7 @@
 package com.flowingcode.fixture.view.screen;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.flowingcode.addons.applayout.PaperCard;
-import com.flowingcode.fixture.view.component.MarkedElement;
-import com.flowingcode.fixture.view.presenter.WelcomePresenter;
+import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -15,27 +12,34 @@ import com.vaadin.flow.router.Route;
 @PageTitle(value = MainLayout.SITE_TITLE)
 public class AboutScreen extends VerticalLayout {
 
-    @Autowired
-    public AboutScreen(final WelcomePresenter presenter) {
+    public AboutScreen() {
         this.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         final VerticalLayout vl = new VerticalLayout();
         vl.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        vl.add(new H4("Worldcup Stats Vaadin 10 Demo Application"));
-        final String markdown = "This is a demo application to try some new technologies:\r\n" +
-                "* Vaadin 10. You can learn more about it in [Vaadin's official site](https://www.vaadin.com/docs).\r\n" +
-                "* Spring framework. Find out more [here](https://spring.io/).\r\n" +
-                "* App Layout Addon for Vaadin 10. Find out more [here](https://vaadin.com/directory/component/app-layout-addon).\r\n" +
-                "* Polymer. Some components from [here](https://www.webcomponents.org), that you can easily integrate in Vaadin 10\r\n\r\n" +
-                "This application consumes the API from [http://worldcup.sfg.io/](http://worldcup.sfg.io/)\r\n\r\n" +
-                "Developed by [Flowing Code S.A.](https://www.flowingcode.com)";
+        vl.add(new H4("Global Football 2026 Stats - Vaadin 25 Demo Application"));
 
-        vl.add(new MarkedElement(markdown));
+        final int year = 2026;
+        final String html = "<div class=\"about-content\">"
+                + "<p>This is a demo application showcasing:</p>"
+                + "<ul>"
+                + "<li>Vaadin 25. Learn more in <a href=\"https://vaadin.com/docs\" target=\"_blank\">Vaadin's official site</a>.</li>"
+                + "<li>Spring Boot. Find out more <a href=\"https://spring.io/\" target=\"_blank\">here</a>.</li>"
+                + "<li>Flowing Code's <a href=\"https://vaadin.com/directory/component/app-layout-addon\" target=\"_blank\">App Layout Add-on</a>.</li>"
+                + "</ul>"
+                + "<p>It shows the fixture and results of the 2026 international football tournament "
+                + "(Canada, USA &amp; Mexico), with data from "
+                + "<a href=\"https://worldcup26.ir/\" target=\"_blank\">worldcup26.ir</a>.</p>"
+                + "<p><small>Unofficial demo. Not affiliated with, endorsed by, or sponsored by FIFA or any "
+                + "football governing body. All team and tournament data comes from the public worldcup26.ir API.</small></p>"
+                + "<p>Developed by <a href=\"https://www.flowingcode.com\" target=\"_blank\">Flowing Code S.A.</a> &copy; " + year + "</p>"
+                + "</div>";
+        vl.add(new Html(html));
 
-        final PaperCard pc = new PaperCard(vl);
-
-        this.add(pc);
-
+        final Card card = new Card();
+        card.addClassName("common-card");
+        card.add(vl);
+        this.add(card);
     }
 
 }
