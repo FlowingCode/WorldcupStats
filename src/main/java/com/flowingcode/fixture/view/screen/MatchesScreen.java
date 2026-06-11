@@ -11,7 +11,7 @@ import com.flowingcode.fixture.view.model.MatchResultDto;
 import com.flowingcode.fixture.view.presenter.MatchesPresenter;
 import com.flowingcode.fixture.view.util.CssStyles;
 import com.flowingcode.fixture.view.util.DateTimeUtil;
-import com.flowingcode.fixture.view.util.MatchUpdater;
+import com.flowingcode.fixture.view.util.LiveScoreSignals;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.NativeLabel;
@@ -28,14 +28,14 @@ public class MatchesScreen extends VerticalLayout {
 
     private final MatchesPresenter presenter;
 
-    private final MatchUpdater matchUpdater;
+    private final LiveScoreSignals liveScores;
 
     private final DateFilterDialog dateFilterDialog;
 
     @Autowired
-    public MatchesScreen(final MatchesPresenter presenter, final MatchUpdater matchUpdater, final DateFilterDialog dateFilterDialog) {
+    public MatchesScreen(final MatchesPresenter presenter, final LiveScoreSignals liveScores, final DateFilterDialog dateFilterDialog) {
         this.presenter = presenter;
-        this.matchUpdater = matchUpdater;
+        this.liveScores = liveScores;
         this.dateFilterDialog = dateFilterDialog;
         presenter.setView(this);
 
@@ -60,7 +60,7 @@ public class MatchesScreen extends VerticalLayout {
         this.add(new H3(new NativeLabel(titleCaption), searchIcon));
 
         for (final MatchResultDto result : results) {
-            final MatchResultComponent matchResultComponent = new MatchResultComponent(result, matchUpdater);
+            final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores);
             this.add(matchResultComponent);
         }
     }

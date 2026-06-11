@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.flowingcode.fixture.view.component.MatchResultComponent;
 import com.flowingcode.fixture.view.model.MatchResultDto;
 import com.flowingcode.fixture.view.presenter.CountryPresenter;
-import com.flowingcode.fixture.view.util.MatchUpdater;
+import com.flowingcode.fixture.view.util.LiveScoreSignals;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
@@ -33,12 +33,12 @@ public class CountryScreen extends VerticalLayout implements HasUrlParameter<Str
 
     private final CountryPresenter presenter;
 
-    private final MatchUpdater matchUpdater;
+    private final LiveScoreSignals liveScores;
 
     @Autowired
-    public CountryScreen(final CountryPresenter presenter, final MatchUpdater matchUpdater) {
+    public CountryScreen(final CountryPresenter presenter, final LiveScoreSignals liveScores) {
         this.presenter = presenter;
-        this.matchUpdater = matchUpdater;
+        this.liveScores = liveScores;
 
         presenter.setView(this);
 
@@ -67,7 +67,7 @@ public class CountryScreen extends VerticalLayout implements HasUrlParameter<Str
     public void init(final List<MatchResultDto> groups) {
         groupsContainer.add(new H3(getTeamName(groups).orElse("Country") + " matches"));
         for (final MatchResultDto dto : groups) {
-            groupsContainer.add(new MatchResultComponent(dto, matchUpdater));
+            groupsContainer.add(new MatchResultComponent(dto, liveScores));
         }
     }
 

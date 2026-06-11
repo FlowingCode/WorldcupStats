@@ -10,7 +10,7 @@ import com.flowingcode.fixture.view.component.MatchResultComponent;
 import com.flowingcode.fixture.view.model.MatchDetailDto;
 import com.flowingcode.fixture.view.model.TeamEventDto;
 import com.flowingcode.fixture.view.presenter.MatchDetailPresenter;
-import com.flowingcode.fixture.view.util.MatchUpdater;
+import com.flowingcode.fixture.view.util.LiveScoreSignals;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.html.H4;
@@ -34,11 +34,11 @@ public class MatchDetailScreen extends VerticalLayout implements HasUrlParameter
 
     private final MatchDetailPresenter presenter;
 
-    private final MatchUpdater matchUpdater;
+    private final LiveScoreSignals liveScores;
 
     @Autowired
-    public MatchDetailScreen(final MatchDetailPresenter presenter, final MatchUpdater matchUpdater) {
-        this.matchUpdater = matchUpdater;
+    public MatchDetailScreen(final MatchDetailPresenter presenter, final LiveScoreSignals liveScores) {
+        this.liveScores = liveScores;
         this.presenter = presenter;
         presenter.setView(this);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -53,7 +53,7 @@ public class MatchDetailScreen extends VerticalLayout implements HasUrlParameter
         removeAll();
 
         // Score card (teams, flags, score, kickoff, stage/group) — reused from the match list.
-        final MatchResultComponent score = new MatchResultComponent(dto, matchUpdater, false);
+        final MatchResultComponent score = new MatchResultComponent(dto, liveScores, false);
         score.addClassName("common-card");
         add(score);
 

@@ -9,7 +9,7 @@ import com.flowingcode.fixture.view.component.MatchResultComponent;
 import com.flowingcode.fixture.view.enums.MatchStatus;
 import com.flowingcode.fixture.view.model.MatchResultDto;
 import com.flowingcode.fixture.view.presenter.WelcomePresenter;
-import com.flowingcode.fixture.view.util.MatchUpdater;
+import com.flowingcode.fixture.view.util.LiveScoreSignals;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -23,12 +23,12 @@ public class WelcomeScreen extends VerticalLayout {
 
     private final WelcomePresenter presenter;
 
-    private final MatchUpdater matchUpdater;
+    private final LiveScoreSignals liveScores;
 
     @Autowired
-    public WelcomeScreen(final WelcomePresenter presenter, final MatchUpdater matchUpdater) {
+    public WelcomeScreen(final WelcomePresenter presenter, final LiveScoreSignals liveScores) {
         this.presenter = presenter;
-        this.matchUpdater = matchUpdater;
+        this.liveScores = liveScores;
         presenter.setView(this);
 
         // center components
@@ -45,7 +45,7 @@ public class WelcomeScreen extends VerticalLayout {
         if (!completedMatches.isEmpty()) {
             this.add(new H3("Completed matches"));
             for (final MatchResultDto result : completedMatches) {
-                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, matchUpdater);
+                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores);
                 this.add(matchResultComponent);
             }
         }
@@ -54,7 +54,7 @@ public class WelcomeScreen extends VerticalLayout {
         if (!currentMatches.isEmpty()) {
             this.add(new H3("Current matches"));
             for (final MatchResultDto result : currentMatches) {
-                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, matchUpdater);
+                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores);
                 this.add(matchResultComponent);
             }
         }
@@ -63,7 +63,7 @@ public class WelcomeScreen extends VerticalLayout {
         if (!upcomingMatches.isEmpty()) {
             this.add(new H3("Upcoming matches"));
             for (final MatchResultDto result : upcomingMatches) {
-                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, matchUpdater);
+                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores);
                 this.add(matchResultComponent);
             }
         }
