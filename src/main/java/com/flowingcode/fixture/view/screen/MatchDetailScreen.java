@@ -1,6 +1,5 @@
 package com.flowingcode.fixture.view.screen;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,7 +9,9 @@ import com.flowingcode.fixture.view.component.MatchResultComponent;
 import com.flowingcode.fixture.view.model.MatchDetailDto;
 import com.flowingcode.fixture.view.model.TeamEventDto;
 import com.flowingcode.fixture.view.presenter.MatchDetailPresenter;
+import com.flowingcode.fixture.view.util.DateTimeUtil;
 import com.flowingcode.fixture.view.util.LiveScoreSignals;
+import com.flowingcode.fixture.view.util.ViewerClock;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.html.H4;
@@ -30,15 +31,16 @@ import com.vaadin.flow.router.Route;
 @PageTitle(value = MainLayout.SITE_TITLE)
 public class MatchDetailScreen extends VerticalLayout implements HasUrlParameter<String> {
 
-    private static final DateTimeFormatter KICKOFF = DateTimeFormatter.ofPattern("EEE dd MMM yyyy, HH:mm");
-
     private final MatchDetailPresenter presenter;
 
     private final LiveScoreSignals liveScores;
 
+    private final ViewerClock clock;
+
     @Autowired
-    public MatchDetailScreen(final MatchDetailPresenter presenter, final LiveScoreSignals liveScores) {
+    public MatchDetailScreen(final MatchDetailPresenter presenter, final LiveScoreSignals liveScores, final ViewerClock clock) {
         this.liveScores = liveScores;
+        this.clock = clock;
         this.presenter = presenter;
         presenter.setView(this);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -46,14 +48,15 @@ public class MatchDetailScreen extends VerticalLayout implements HasUrlParameter
 
     @Override
     public void setParameter(final BeforeEvent event, final String parameter) {
-        presenter.loadResults(parameter);
+        // Render now; re-render once the viewer's time zone resolves (local times).
+        clock.render(() -> presenter.loadResults(parameter));
     }
 
     public void init(final MatchDetailDto dto) {
         removeAll();
 
         // Score card (teams, flags, score, kickoff, stage/group) — reused from the match list.
-        final MatchResultComponent score = new MatchResultComponent(dto, liveScores, false);
+        final MatchResultComponent score = new MatchResultComponent(dto, liveScores, clock, false);
         score.addClassName("common-card");
         add(score);
 
@@ -67,7 +70,8 @@ public class MatchDetailScreen extends VerticalLayout implements HasUrlParameter
             body.add(infoLine(VaadinIcon.MAP_MARKER, place));
         }
         if (dto.getDateTime() != null) {
-            body.add(infoLine(VaadinIcon.CALENDAR_CLOCK, dto.getDateTime().format(KICKOFF)));
+            body.add(infoLine(VaadinIcon.CALENDAR_CLOCK,
+                    DateTimeUtil.dateTime(dto.getDateTime(), clock.zone(), clock.locale())));
         }
 
         final List<TeamEventDto> homeGoals = dto.getHomeTeamEvents();

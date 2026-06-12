@@ -15,6 +15,7 @@ import com.flowingcode.fixture.view.component.MatchResultComponent;
 import com.flowingcode.fixture.view.model.MatchResultDto;
 import com.flowingcode.fixture.view.presenter.CountryPresenter;
 import com.flowingcode.fixture.view.util.LiveScoreSignals;
+import com.flowingcode.fixture.view.util.ViewerClock;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
@@ -35,10 +36,13 @@ public class CountryScreen extends VerticalLayout implements HasUrlParameter<Str
 
     private final LiveScoreSignals liveScores;
 
+    private final ViewerClock clock;
+
     @Autowired
-    public CountryScreen(final CountryPresenter presenter, final LiveScoreSignals liveScores) {
+    public CountryScreen(final CountryPresenter presenter, final LiveScoreSignals liveScores, final ViewerClock clock) {
         this.presenter = presenter;
         this.liveScores = liveScores;
+        this.clock = clock;
 
         presenter.setView(this);
 
@@ -67,13 +71,14 @@ public class CountryScreen extends VerticalLayout implements HasUrlParameter<Str
     public void init(final List<MatchResultDto> groups) {
         groupsContainer.add(new H3(getTeamName(groups).orElse("Country") + " matches"));
         for (final MatchResultDto dto : groups) {
-            groupsContainer.add(new MatchResultComponent(dto, liveScores));
+            groupsContainer.add(new MatchResultComponent(dto, liveScores, clock));
         }
     }
 
     @Override
     public void setParameter(final BeforeEvent ev, final String country) {
-        presenter.loadResults(country);
+        // Render now; re-render once the viewer's time zone resolves (local times).
+        clock.render(() -> presenter.loadResults(country));
     }
 
 }

@@ -33,9 +33,6 @@ public class MatchServiceImpl implements MatchService {
 
     private static final DateTimeFormatter LOCAL_DATE = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
-    /** Host-region timezone used to interpret the API's local kick-off times. */
-    private static final ZoneId ZONE = ZoneId.of("America/New_York");
-
     private static final String NULL = "null";
 
     private final WorldCupClient client;
@@ -195,10 +192,13 @@ public class MatchServiceImpl implements MatchService {
     }
 
     private ZonedDateTime parseKickoff(final Game source) {
+        // The API's local_date is the venue's local wall-clock; attach the real
+        // venue zone so the resulting instant is correct across host cities.
+        final ZoneId zone = stadiumCatalog.zoneById(source.stadium_id());
         try {
-            return LocalDateTime.parse(source.local_date(), LOCAL_DATE).atZone(ZONE);
+            return LocalDateTime.parse(source.local_date(), LOCAL_DATE).atZone(zone);
         } catch (final RuntimeException e) {
-            return ZonedDateTime.now(ZONE);
+            return ZonedDateTime.now(zone);
         }
     }
 
