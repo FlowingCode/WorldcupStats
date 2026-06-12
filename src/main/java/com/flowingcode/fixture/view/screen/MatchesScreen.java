@@ -12,6 +12,7 @@ import com.flowingcode.fixture.view.presenter.MatchesPresenter;
 import com.flowingcode.fixture.view.util.CssStyles;
 import com.flowingcode.fixture.view.util.DateTimeUtil;
 import com.flowingcode.fixture.view.util.LiveScoreSignals;
+import com.flowingcode.fixture.view.util.ViewerClock;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.NativeLabel;
@@ -30,12 +31,16 @@ public class MatchesScreen extends VerticalLayout {
 
     private final LiveScoreSignals liveScores;
 
+    private final ViewerClock clock;
+
     private final DateFilterDialog dateFilterDialog;
 
     @Autowired
-    public MatchesScreen(final MatchesPresenter presenter, final LiveScoreSignals liveScores, final DateFilterDialog dateFilterDialog) {
+    public MatchesScreen(final MatchesPresenter presenter, final LiveScoreSignals liveScores, final ViewerClock clock,
+            final DateFilterDialog dateFilterDialog) {
         this.presenter = presenter;
         this.liveScores = liveScores;
+        this.clock = clock;
         this.dateFilterDialog = dateFilterDialog;
         presenter.setView(this);
 
@@ -45,7 +50,8 @@ public class MatchesScreen extends VerticalLayout {
 
     @Override
     protected void onAttach(final AttachEvent attachEvent) {
-        presenter.loadResults();
+        // Render now; re-render once the viewer's time zone resolves (local times).
+        clock.render(presenter::loadResults);
     }
 
     public void init(final LocalDate date, final List<MatchResultDto> results) {
@@ -60,7 +66,7 @@ public class MatchesScreen extends VerticalLayout {
         this.add(new H3(new NativeLabel(titleCaption), searchIcon));
 
         for (final MatchResultDto result : results) {
-            final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores);
+            final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores, clock);
             this.add(matchResultComponent);
         }
     }

@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -33,7 +35,9 @@ class MatchServiceImplTest {
     @BeforeEach
     void setUp() {
         client = mock(WorldCupClient.class);
-        service = new MatchServiceImpl(client, mock(TeamCatalog.class), mock(StadiumCatalog.class));
+        // Real StadiumCatalog: its zoneById is a static lookup (no network), and
+        // parseKickoff now depends on it.
+        service = new MatchServiceImpl(client, mock(TeamCatalog.class), new StadiumCatalog(mock(WorldCupClient.class)));
     }
 
     /** Builds a Game with sensible defaults; override only what a test cares about. */
@@ -112,6 +116,23 @@ class MatchServiceImplTest {
                 .isEqualTo("Third place");
         assertThat(convertSingle(game("FALSE", "notstarted", "final", null, today(), "0", "0")).getStageName())
                 .isEqualTo("Final");
+    }
+
+    @Test
+    void kickoff_isInterpretedInTheVenueTimeZone() {
+        // Same wall-clock string at two venues must yield different instants:
+        // 13:00 in LA (UTC-7 in June) vs 13:00 in NY (UTC-4 in June) = 3h apart.
+        final Game la = new Game("1", "10", "20", "0", "0", null, null, "A", "1", "06/15/2026 13:00",
+                "16", "FALSE", "notstarted", "group", "Mexico", "Canada");   // SoFi → America/Los_Angeles
+        final Game ny = new Game("2", "10", "20", "0", "0", null, null, "A", "1", "06/15/2026 13:00",
+                "11", "FALSE", "notstarted", "group", "Mexico", "Canada");   // MetLife → America/New_York
+
+        when(client.getGames()).thenReturn(List.of(la));
+        final ZonedDateTime laKickoff = service.getMatches().get(0).getKickoff();
+        when(client.getGames()).thenReturn(List.of(ny));
+        final ZonedDateTime nyKickoff = service.getMatches().get(0).getKickoff();
+
+        assertThat(Duration.between(nyKickoff.toInstant(), laKickoff.toInstant()).toHours()).isEqualTo(3);
     }
 
     @Test

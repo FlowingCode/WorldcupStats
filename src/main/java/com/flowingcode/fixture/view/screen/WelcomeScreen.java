@@ -10,6 +10,7 @@ import com.flowingcode.fixture.view.enums.MatchStatus;
 import com.flowingcode.fixture.view.model.MatchResultDto;
 import com.flowingcode.fixture.view.presenter.WelcomePresenter;
 import com.flowingcode.fixture.view.util.LiveScoreSignals;
+import com.flowingcode.fixture.view.util.ViewerClock;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -25,10 +26,13 @@ public class WelcomeScreen extends VerticalLayout {
 
     private final LiveScoreSignals liveScores;
 
+    private final ViewerClock clock;
+
     @Autowired
-    public WelcomeScreen(final WelcomePresenter presenter, final LiveScoreSignals liveScores) {
+    public WelcomeScreen(final WelcomePresenter presenter, final LiveScoreSignals liveScores, final ViewerClock clock) {
         this.presenter = presenter;
         this.liveScores = liveScores;
+        this.clock = clock;
         presenter.setView(this);
 
         // center components
@@ -37,7 +41,8 @@ public class WelcomeScreen extends VerticalLayout {
 
     @Override
     protected void onAttach(final AttachEvent attachEvent) {
-        presenter.loadResults();
+        // Render now; re-render once the viewer's time zone resolves (local times).
+        clock.render(presenter::loadResults);
     }
 
     public void init(final List<MatchResultDto> results) {
@@ -45,7 +50,7 @@ public class WelcomeScreen extends VerticalLayout {
         if (!completedMatches.isEmpty()) {
             this.add(new H3("Completed matches"));
             for (final MatchResultDto result : completedMatches) {
-                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores);
+                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores, clock);
                 this.add(matchResultComponent);
             }
         }
@@ -54,7 +59,7 @@ public class WelcomeScreen extends VerticalLayout {
         if (!currentMatches.isEmpty()) {
             this.add(new H3("Current matches"));
             for (final MatchResultDto result : currentMatches) {
-                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores);
+                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores, clock);
                 this.add(matchResultComponent);
             }
         }
@@ -63,7 +68,7 @@ public class WelcomeScreen extends VerticalLayout {
         if (!upcomingMatches.isEmpty()) {
             this.add(new H3("Upcoming matches"));
             for (final MatchResultDto result : upcomingMatches) {
-                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores);
+                final MatchResultComponent matchResultComponent = new MatchResultComponent(result, liveScores, clock);
                 this.add(matchResultComponent);
             }
         }

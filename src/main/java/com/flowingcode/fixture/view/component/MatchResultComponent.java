@@ -1,6 +1,8 @@
 package com.flowingcode.fixture.view.component;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,6 +14,7 @@ import com.flowingcode.fixture.view.screen.MatchDetailScreen;
 import com.flowingcode.fixture.view.util.CssStyles;
 import com.flowingcode.fixture.view.util.DateTimeUtil;
 import com.flowingcode.fixture.view.util.LiveScoreSignals;
+import com.flowingcode.fixture.view.util.ViewerClock;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.card.Card;
@@ -51,16 +54,23 @@ public class MatchResultComponent extends Card {
 
     private final MatchResume matchResume;
 
+    private final ZoneId zone;
+
+    private final Locale locale;
+
     private Span matchTimeContainer;
 
     private Span dotsContainer;
 
-    public MatchResultComponent(final MatchResume dto, final LiveScoreSignals liveScores) {
-        this(dto, liveScores, true);
+    public MatchResultComponent(final MatchResume dto, final LiveScoreSignals liveScores, final ViewerClock clock) {
+        this(dto, liveScores, clock, true);
     }
 
-    public MatchResultComponent(final MatchResume dto, final LiveScoreSignals liveScores, final boolean showDetailsButton) {
+    public MatchResultComponent(final MatchResume dto, final LiveScoreSignals liveScores, final ViewerClock clock,
+            final boolean showDetailsButton) {
         this.matchResume = dto;
+        this.zone = clock.zone();
+        this.locale = clock.locale();
 
         // Bind every live-changing element to this match's shared signal. The
         // bindings register effects that Vaadin tears down automatically on
@@ -182,7 +192,7 @@ public class MatchResultComponent extends Card {
         switch (live.status()) {
             case COMPLETED:
             case FUTURE:
-                return DateTimeUtil.styleDate(matchResume.getKickoff());
+                return DateTimeUtil.date(matchResume.getKickoff(), zone, locale);
             case IN_PROGRESS:
             case TODAY:
                 return MatchStatus.TODAY.name();
@@ -199,7 +209,7 @@ public class MatchResultComponent extends Card {
                 return live.minutes();
             case TODAY:
             case FUTURE:
-                return DateTimeUtil.styleTime(matchResume.getKickoff());
+                return DateTimeUtil.time(matchResume.getKickoff(), zone, locale);
             default:
                 return EMPTY;
         }
