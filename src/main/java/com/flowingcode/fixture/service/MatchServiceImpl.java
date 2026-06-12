@@ -120,13 +120,20 @@ public class MatchServiceImpl implements MatchService {
         return target;
     }
 
-    /** worldcup26.ir only exposes goal scorers (as a name list), not full event feeds. */
+    /**
+     * worldcup26.ir only exposes goal scorers (not full event feeds), and ships
+     * them as a set-like string with curly braces and quoted entries, e.g.
+     * {@code {"J. Quiñones 9'", "R. Jiménez 67'"}}. Strip that wrapping (braces
+     * and straight/typographic quotes) so only the names — with their inline
+     * minute — are shown.
+     */
     private List<TeamEventDto> scorerEvents(final String scorers) {
         final List<TeamEventDto> events = new ArrayList<>();
         if (scorers == null || scorers.isBlank() || NULL.equalsIgnoreCase(scorers)) {
             return events;
         }
-        for (final String name : scorers.split(",")) {
+        final String unwrapped = scorers.replaceAll("[{}\"“”]", "");
+        for (final String name : unwrapped.split(",")) {
             final String player = name.trim();
             if (player.isEmpty()) {
                 continue;

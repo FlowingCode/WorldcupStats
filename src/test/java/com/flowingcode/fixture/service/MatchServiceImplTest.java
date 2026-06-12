@@ -18,7 +18,9 @@ import com.flowingcode.fixture.repository.worldcup.TeamCatalog;
 import com.flowingcode.fixture.repository.worldcup.Wc26Dtos.Game;
 import com.flowingcode.fixture.repository.worldcup.WorldCupClient;
 import com.flowingcode.fixture.view.enums.MatchStatus;
+import com.flowingcode.fixture.view.model.MatchDetailDto;
 import com.flowingcode.fixture.view.model.MatchResultDto;
+import com.flowingcode.fixture.view.model.TeamEventDto;
 
 /**
  * Exercises the worldcup26.ir &rarr; view-DTO mapping in {@link MatchServiceImpl}:
@@ -133,6 +135,20 @@ class MatchServiceImplTest {
         final ZonedDateTime nyKickoff = service.getMatches().get(0).getKickoff();
 
         assertThat(Duration.between(nyKickoff.toInstant(), laKickoff.toInstant()).toHours()).isEqualTo(3);
+    }
+
+    @Test
+    void scorerEvents_stripTheApiSetWrappingFromPlayerNames() {
+        // worldcup26.ir ships scorers as {"Name 9'", "Name 67'"} with typographic quotes.
+        final String scorers = "{“J. Quiñones 9'”, “R. Jiménez 67'”}";
+        final Game g = new Game("9", "10", "20", "2", "0", scorers, "null", "A", "1", today(),
+                "1", "FALSE", "live", "group", "Mexico", "Canada");
+        when(client.getGames()).thenReturn(List.of(g));
+
+        final MatchDetailDto detail = service.getByFifaId("9").orElseThrow();
+
+        assertThat(detail.getHomeTeamEvents()).extracting(TeamEventDto::getPlayer)
+                .containsExactly("J. Quiñones 9'", "R. Jiménez 67'");
     }
 
     @Test
