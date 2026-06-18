@@ -61,7 +61,7 @@ public class MatchesScreen extends VerticalLayout {
         final Icon searchIcon = new Icon(VaadinIcon.SEARCH);
         searchIcon.addClassName(CssStyles.PADDING_LEFT_10);
         searchIcon.addClassName(CssStyles.CLICKABLE);
-        searchIcon.getElement().addEventListener("click", e -> dateFilterDialog.open(presenter::filterByDate));
+        searchIcon.addClickListener(e -> dateFilterDialog.open(presenter::filterByDate));
 
         this.add(new H3(new NativeLabel(titleCaption), searchIcon));
 
