@@ -41,8 +41,6 @@ public class DateFilterDialog  {
 		layout.add(combobox);
 		Button acceptButton = new Button("Accept", ev-> accept());
 		Button cancelButton = new Button("Cancel", ev-> cancel());
-		acceptButton.setWidth("80px");
-		cancelButton.setWidth("80px");
 		HorizontalLayout buttons = new HorizontalLayout(acceptButton, cancelButton);
 		buttons.setSpacing(true);
 		
