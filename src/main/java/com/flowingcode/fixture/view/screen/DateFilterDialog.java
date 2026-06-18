@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.flowingcode.fixture.service.MatchService;
 import com.flowingcode.fixture.view.util.DateTimeUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -60,6 +61,11 @@ public class DateFilterDialog  {
 	
 	public void open(SerializableConsumer<LocalDate> callback) {
 		this.callback = Objects.requireNonNull(callback);
+		// Defensive: make sure the dialog is attached to the current UI before
+		// opening, in case open() does not auto-attach it.
+		if (!dialog.isAttached()) {
+			UI.getCurrent().add(dialog);
+		}
 		dialog.open();
 	}
 	
