@@ -42,6 +42,8 @@ java -jar target/worldcup-fixture-2.0.0-SNAPSHOT.jar
 
 For more information on Vaadin Flow, visit <https://vaadin.com/flow>.
 
+For more information regarding this demo application, refer to [this blog post](https://www.flowingcode.com/en/vaadin-10-to-25-migrating-a-8-year-old-app-with-claude-ai/).
+
 ## Disclaimer
 
 Unofficial demo application. Not affiliated with, endorsed by, or sponsored by FIFA or any
